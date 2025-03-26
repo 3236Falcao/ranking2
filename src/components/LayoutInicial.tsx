@@ -1,3 +1,4 @@
+// components/LayoutInicial.tsx
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
@@ -13,17 +14,18 @@ const Container = styled.div`
 
 const Header = styled.header`
   background-color: ${(props) => props.theme.colors.primary};
-  color: white;
+  color: ${(props) => props.theme.colors.white};
   padding: ${(props) => props.theme.spacing.medium};
   text-align: center;
 `;
 
 const Nav = styled.nav`
-  margin-top: 10px;
+  margin-top: ${(props) => props.theme.spacing.small};
   a {
-    color: white;
-    margin: 0 10px;
+    color: ${(props) => props.theme.colors.white};
+    margin: 0 ${(props) => props.theme.spacing.small};
     text-decoration: none;
+    font-size: 1.1rem;
     &:hover {
       text-decoration: underline;
     }
@@ -32,13 +34,14 @@ const Nav = styled.nav`
 
 const Main = styled.main`
   flex: 1;
-  padding: ${(props) => props.theme.spacing.large};
+  /* No padding here; pages handle their own */
 `;
 
 const Footer = styled.footer`
   background-color: ${(props) => props.theme.colors.background};
   padding: ${(props) => props.theme.spacing.medium};
   text-align: center;
+  color: ${(props) => props.theme.colors.text};
 `;
 
 const LayoutInicial: React.FC<LayoutInicialProps> = ({ children }) => {
