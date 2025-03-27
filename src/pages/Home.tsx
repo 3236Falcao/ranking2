@@ -1,5 +1,6 @@
 // pages/Home.tsx
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 interface Grade {
   portugues: number;
@@ -38,7 +39,7 @@ const guessGender = (name: string): 'male' | 'female' => {
 
 const HomeContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.large} ${({ theme }) => theme.spacing.medium};
-  padding-top: 60px; /* Keeps title higher as requested */
+  padding-top: 60px;
   max-width: 1400px;
   margin: 0 auto;
   display: flex;
@@ -104,6 +105,34 @@ const TopStudentName = styled.p`
   margin: 0;
 `;
 
+const Button = styled(Link)`
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  padding: ${({ theme }) => theme.spacing.medium};
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  margin-top: ${({ theme }) => theme.spacing.large};
+  display: inline-block;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primary}cc;
+  }
+`;
+
+const EditButton = styled(Link)`
+  background-color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.white};
+  padding: ${({ theme }) => theme.spacing.medium};
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  margin-top: ${({ theme }) => theme.spacing.large};
+  display: inline-block;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.secondary}cc;
+  }
+`;
+
 const Home: React.FC<HomeProps> = ({ students = [] }) => {
   const rankedStudents = [...students]
     .map(student => {
@@ -120,17 +149,23 @@ const Home: React.FC<HomeProps> = ({ students = [] }) => {
         <h1>Bem-vindo ao Ranking Escolar</h1>
         <p>Esta é a página inicial.</p>
       </HeaderSection>
-      {topStudent && (
-        <TopStudentSection>
-          <h2>Primeiro Lugar</h2>
-          <TopStudentCard>
-            <TopStudentAvatar>
-              {guessGender(topStudent.name) === 'male' ? '👨' : '👩'}
-            </TopStudentAvatar>
-            <TopStudentName>{topStudent.name}</TopStudentName>
-          </TopStudentCard>
-        </TopStudentSection>
+      {topStudent ? (
+        <>
+          <TopStudentSection>
+            <h2>Primeiro Lugar</h2>
+            <TopStudentCard>
+              <TopStudentAvatar>
+                {guessGender(topStudent.name) === 'male' ? '👨' : '👩'}
+              </TopStudentAvatar>
+              <TopStudentName>{topStudent.name}</TopStudentName>
+            </TopStudentCard>
+          </TopStudentSection>
+          <EditButton to={`/edit/${topStudent.id}`}>Editar Cadastro</EditButton>
+        </>
+      ) : (
+        <p>Nenhum aluno cadastrado ainda.</p>
       )}
+      <Button to="/cadastro">Cadastrar Aluno</Button>
     </HomeContainer>
   );
 };

@@ -1,10 +1,13 @@
-// App.tsx
+// src/app.tsx
+import { useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { theme } from './styles/theme';
 import LayoutInicial from './components/LayoutInicial';
 import Home from './pages/Home';
 import Ranking from './pages/Ranking';
+import Cadastro from './pages/Cadastro';
+import EditCadastro from './pages/EditCadastro';
 
 interface Grade {
   portugues: number;
@@ -23,20 +26,19 @@ interface Student {
 }
 
 function App() {
-  const students: Student[] = [
-    {
-      id: 1,
-      name: "João Silva",
-      class: "8A",
-      grades: { portugues: 8.5, matematica: 7.8, historia: 9.0, ciencias: 8.2, geografia: 8.8, ensinoReligioso: 7.5 }
-    },
-    {
-      id: 2,
-      name: "Maria Oliveira",
-      class: "8A",
-      grades: { portugues: 9.2, matematica: 8.5, historia: 8.8, ciencias: 9.0, geografia: 9.5, ensinoReligioso: 8.0 }
-    },
-  ];
+  const [students, setStudents] = useState<Student[]>([]);
+
+  const addStudent = (newStudent: Student) => {
+    setStudents(prevStudents => [...prevStudents, newStudent]);
+  };
+
+  const updateStudent = (updatedStudent: Student) => {
+    setStudents(prevStudents =>
+      prevStudents.map(student =>
+        student.id === updatedStudent.id ? updatedStudent : student
+      )
+    );
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -45,6 +47,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home students={students} />} />
             <Route path="/ranking" element={<Ranking students={students} />} />
+            <Route path="/cadastro" element={<Cadastro addStudent={addStudent} students={students} />} />
+            <Route path="/edit/:id" element={<EditCadastro students={students} updateStudent={updateStudent} />} />
           </Routes>
         </LayoutInicial>
       </Router>
