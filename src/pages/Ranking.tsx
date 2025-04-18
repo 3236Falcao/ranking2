@@ -1,4 +1,3 @@
-// pages/Ranking.tsx
 import styled from 'styled-components';
 
 interface Grade {
