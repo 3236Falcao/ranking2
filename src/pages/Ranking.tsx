@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Student, Suggestion } from '../types';
+import { Student, Suggestion, RankedStudent } from '../types';
 
 interface RankingProps {
   students: Student[];
@@ -13,7 +13,7 @@ interface RankingProps {
   rejectSuggestion: (id: number) => void;
 }
 
-function calculateRanking(students: Student[]) {
+function calculateRanking(students: Student[]): RankedStudent[] {
   try {
     return students
       .map(student => {
@@ -27,7 +27,12 @@ function calculateRanking(students: Student[]) {
       .sort((a, b) => b.finalScore - a.finalScore);
   } catch (error) {
     console.error('Erro em calculateRanking:', error);
-    return students;
+    return students.map(student => ({
+      ...student,
+      totalScore: 0,
+      avgGrade: 0,
+      finalScore: 0,
+    }));
   }
 }
 
