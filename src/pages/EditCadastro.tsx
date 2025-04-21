@@ -1,240 +1,117 @@
-// src/pages/EditCadastro.tsx
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { useNavigate, useParams } from 'react-router-dom';
-
-interface Grade {
-  portugues: number;
-  matematica: number;
-  historia: number;
-  ciencias: number;
-  geografia: number;
-  ensinoReligioso: number;
-}
-
-interface Student {
-  id: number;
-  name: string;
-  class: string;
-  grades: Grade;
-}
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { Student } from '../types';
 
 interface EditCadastroProps {
   students: Student[];
   updateStudent: (student: Student) => void;
 }
 
-const EditContainer = styled.div`
-  padding: ${({ theme }) => theme.spacing.large} ${({ theme }) => theme.spacing.medium};
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: ${({ theme }) => theme.colors.background};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Form = styled.form`
-  background: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing.large};
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-`;
-
-const Title = styled.h1`
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 2rem;
-  margin-bottom: ${({ theme }) => theme.spacing.large};
-  text-align: center;
-`;
-
-const InputGroup = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing.medium};
-`;
-
-const Label = styled.label`
-  display: block;
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 1.1rem;
-  margin-bottom: ${({ theme }) => theme.spacing.small};
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: ${({ theme }) => theme.spacing.small};
-  border: 1px solid ${({ theme }) => theme.colors.secondary}50;
-  border-radius: 4px;
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const SaveButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing.medium};
-  border: none;
-  border-radius: 8px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  width: 100%;
-  margin-top: ${({ theme }) => theme.spacing.large};
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.primary}cc;
-  }
-`;
-
 const EditCadastro: React.FC<EditCadastroProps> = ({ students, updateStudent }) => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const studentToEdit = students.find(student => student.id === Number(id));
-
-  const [formData, setFormData] = useState({
-    name: studentToEdit?.name || '',
-    class: studentToEdit?.class || '',
-    portugues: studentToEdit?.grades.portugues.toString() || '',
-    matematica: studentToEdit?.grades.matematica.toString() || '',
-    historia: studentToEdit?.grades.historia.toString() || '',
-    ciencias: studentToEdit?.grades.ciencias.toString() || '',
-    geografia: studentToEdit?.grades.geografia.toString() || '',
-    ensinoReligioso: studentToEdit?.grades.ensinoReligioso.toString() || '',
+  const student = students.find(s => s.id === Number(id));
+  const [name, setName] = useState(student?.name || '');
+  const [className, setClassName] = useState(student?.class || '');
+  const [grades, setGrades] = useState(student?.grades || {
+    portugues: 0,
+    matematica: 0,
+    historia: 0,
+    ciencias: 0,
+    geografia: 0,
+    ensinoReligioso: 0,
   });
 
   useEffect(() => {
-    if (!studentToEdit) {
-      navigate('/');
+    if (student) {
+      setName(student.name);
+      setClassName(student.class);
+      setGrades(student.grades);
     }
-  }, [studentToEdit, navigate]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, [student]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedStudent: Student = {
-      id: Number(id),
-      name: formData.name.trim(),
-      class: formData.class,
-      grades: {
-        portugues: parseFloat(formData.portugues) || 0,
-        matematica: parseFloat(formData.matematica) || 0,
-        historia: parseFloat(formData.historia) || 0,
-        ciencias: parseFloat(formData.ciencias) || 0,
-        geografia: parseFloat(formData.geografia) || 0,
-        ensinoReligioso: parseFloat(formData.ensinoReligioso) || 0,
-      },
-    };
-    updateStudent(updatedStudent);
-    navigate('/ranking');
+    if (student) {
+      const updatedStudent: Student = {
+        ...student,
+        name,
+        class: className,
+        grades,
+        effortPoints: student.effortPoints,
+      };
+      updateStudent(updatedStudent);
+    }
   };
 
+  if (!student) return <div>Aluno não encontrado</div>;
+
   return (
-    <EditContainer>
-      <Title>Editar Cadastro de Aluno</Title>
-      <Form onSubmit={handleSubmit}>
-        <InputGroup>
-          <Label>Nome</Label>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>Turma</Label>
-          <Input
-            type="text"
-            name="class"
-            value={formData.class}
-            onChange={handleChange}
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>Português</Label>
-          <Input
-            type="number"
-            name="portugues"
-            value={formData.portugues}
-            onChange={handleChange}
-            min="0"
-            max="10"
-            step="0.1"
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>Matemática</Label>
-          <Input
-            type="number"
-            name="matematica"
-            value={formData.matematica}
-            onChange={handleChange}
-            min="0"
-            max="10"
-            step="0.1"
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>História</Label>
-          <Input
-            type="number"
-            name="historia"
-            value={formData.historia}
-            onChange={handleChange}
-            min="0"
-            max="10"
-            step="0.1"
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>Ciências</Label>
-          <Input
-            type="number"
-            name="ciencias"
-            value={formData.ciencias}
-            onChange={handleChange}
-            min="0"
-            max="10"
-            step="0.1"
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>Geografia</Label>
-          <Input
-            type="number"
-            name="geografia"
-            value={formData.geografia}
-            onChange={handleChange}
-            min="0"
-            max="10"
-            step="0.1"
-            required
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label>Ensino Religioso</Label>
-          <Input
-            type="number"
-            name="ensinoReligioso"
-            value={formData.ensinoReligioso}
-            onChange={handleChange}
-            min="0"
-            max="10"
-            step="0.1"
-            required
-          />
-        </InputGroup>
-        <SaveButton type="submit">Salvar Alterações</SaveButton>
-      </Form>
-    </EditContainer>
+    <form onSubmit={handleSubmit}>
+      <h1>Editar Aluno</h1>
+      <div>
+        <label>Nome:</label>
+        <input type="text" value={name} onChange={e => setName(e.target.value)} required />
+      </div>
+      <div>
+        <label>Turma:</label>
+        <input type="text" value={className} onChange={e => setClassName(e.target.value)} required />
+      </div>
+      <div>
+        <label>Português:</label>
+        <input
+          type="number"
+          value={grades.portugues}
+          onChange={e => setGrades({ ...grades, portugues: Number(e.target.value) })}
+          required
+        />
+      </div>
+      <div>
+        <label>Matemática:</label>
+        <input
+          type="number"
+          value={grades.matematica}
+          onChange={e => setGrades({ ...grades, matematica: Number(e.target.value) })}
+          required
+        />
+      </div>
+      <div>
+        <label>História:</label>
+        <input
+          type="number"
+          value={grades.historia}
+          onChange={e => setGrades({ ...grades, historia: Number(e.target.value) })}
+          required
+        />
+      </div>
+      <div>
+        <label>Ciências:</label>
+        <input
+          type="number"
+          value={grades.ciencias}
+          onChange={e => setGrades({ ...grades, ciencias: Number(e.target.value) })}
+          required
+        />
+      </div>
+      <div>
+        <label>Geografia:</label>
+        <input
+          type="number"
+          value={grades.geografia}
+          onChange={e => setGrades({ ...grades, geografia: Number(e.target.value) })}
+          required
+        />
+      </div>
+      <div>
+        <label>Ensino Religioso:</label>
+        <input
+          type="number"
+          value={grades.ensinoReligioso}
+          onChange={e => setGrades({ ...grades, ensinoReligioso: Number(e.target.value) })}
+          required
+        />
+      </div>
+      <button type="submit">Salvar</button>
+    </form>
   );
 };
 
