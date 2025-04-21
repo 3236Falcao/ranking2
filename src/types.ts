@@ -16,6 +16,12 @@ export interface Student {
   effortPoints: number;
 }
 
+export interface RankedStudent extends Student {
+  totalScore: number;
+  avgGrade: number;
+  finalScore: number;
+}
+
 export interface Suggestion {
   id: number;
   type: 'improvement' | 'new_feature';
